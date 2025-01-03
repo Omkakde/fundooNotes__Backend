@@ -2,22 +2,21 @@ import sequelize, { DataTypes } from '../config/database';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import user from '../models/user';
-
+import { IUser } from '../interfaces/user.interface';
 class UserService {
   private User = user(sequelize, DataTypes);
 
-  public newUser = async (body: { firstName: string; lastName: string; email: string; password: string }) => {
-    try {
-      const { email } = body;
-      const exist = await this.User.findOne({ where: { email } });
 
+  // create new user
+  public newUser = async (body: IUser ) => {
+    try {
+     
+      const exist = await this.User.findOne({ where: { email: body.email } });
       if (exist) {
         throw new Error('User already exists');
       }
 
-      
-      const password = body.password;
-      body.password = await bcrypt.hash(password, 10);
+      body.password = await bcrypt.hash(body.password, 10);
 
       const data = await this.User.create(body);
 
@@ -36,6 +35,8 @@ class UserService {
   };
 
 
+
+  //Refresh token
   public refreshToken = async (req, res) => {
     const { refreshtoken } = req.body;
     if (!refreshtoken) {
@@ -66,12 +67,12 @@ class UserService {
 
   
 
-  
+  //Login
   public userLogin = async (body) => {
-    const { email, password } = body;
+    
     try {
       
-      const data = await this.User.findOne({ where: { email } });
+      const data = await this.User.findOne({ where: {email:body.email } });
 
       if (!data) {
         return {
@@ -79,7 +80,7 @@ class UserService {
         };
       }
 
-      const match = await bcrypt.compare(password, data.password);
+      const match = await bcrypt.compare(body.password, data.password);
 
       if (!match) {
         return {

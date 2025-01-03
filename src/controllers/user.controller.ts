@@ -8,20 +8,26 @@ class UserController {
   public UserService = new userService();
 
  
+  // new user controller
   public newUser = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const data = await this.UserService.newUser(req.body);
+      
       res.status(HttpStatus.CREATED).json({
         code: HttpStatus.CREATED,
-        data: data,
-        message: 'User created successfully'
+        message: `${req.body.firstname} ${req.body.lastname} registered Successfully!`
       });
     } catch (error) {
-      next(error);
+      res.status(HttpStatus.BAD_REQUEST).json({
+        code: HttpStatus.BAD_REQUEST,
+        message: `${error}`});
+    
+    
     }
   };
 
 
+  // refresh token controller
   public refreshToken = async(req:Request, res:Response, next: NextFunction)=>{
     try{
       await this.UserService.refreshToken(req, res);
@@ -36,13 +42,19 @@ class UserController {
   public userLogin = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const data = await this.UserService.userLogin(req.body);
-      res.status(HttpStatus.CREATED).json({
-        code: HttpStatus.CREATED,
+      
+      res.status(HttpStatus.OK).json({
+        code: HttpStatus.OK,
         data: data,
         message: 'Login successfully'
-      });
+        });
+
     } catch (error) {
-      next(error);
+      res.status(HttpStatus.BAD_REQUEST).json({
+        code: HttpStatus.BAD_REQUEST,
+        
+        message: `${error}`})
+    
     }
   };
 
