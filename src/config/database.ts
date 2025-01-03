@@ -9,23 +9,16 @@ export { DataTypes } from 'sequelize';
 const logger = Logger.logger;
 
 let DATABASE = process.env.DATABASE;
-let USERNAME = process.env.USERNAME;
+let USERNAME = process.env.USERNAME_DB;
 let PASSWORD = process.env.PASSWORD;
 let HOST = process.env.HOST;
 let PORT = parseInt(process.env.PORT);
 
-if (process.env.NODE_ENV === 'test') {
-  DATABASE = process.env.DATABASE_TEST;
-  USERNAME = process.env.USERNAME_TEST;
-  PASSWORD = process.env.PASSWORD_TEST;
-  HOST = process.env.HOST_TEST;
-  PORT = parseInt(process.env.PORT_TEST);
-}
 
 const sequelize = new Sequelize(DATABASE, USERNAME, PASSWORD, {
   host: HOST,
   port: PORT,
-  dialect: 'mysql',
+  dialect: 'postgres',
   pool: {
     max: 5,
     min: 0,
@@ -33,6 +26,7 @@ const sequelize = new Sequelize(DATABASE, USERNAME, PASSWORD, {
     idle: 10000
   }
 });
+
 
 sequelize
   .authenticate()
