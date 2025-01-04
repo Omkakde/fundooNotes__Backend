@@ -26,7 +26,7 @@ class NoteRoutes {
 
     this.router.put('/archive/:id', userAuth, this.NoteController.toggleArchive);
 
-    
+    this.router.put('/trash/:id', userAuth, this.NoteController.toggleTrash);
 
   }
 

@@ -91,7 +91,23 @@ public toggleArchiveById = async (noteId: string, userId: any): Promise<INotes |
   }
 };
 
-
+public toggleTrashById = async (noteId: string, userId: any): Promise<INotes | null> => {
+  try {
+    const note = await this.note.findOne({where: {id: noteId ,createdBy: userId }});
+    if (!note) {
+      throw new Error('Note not found or user not authorized');
+    }
+    note.isTrash = !note.isTrash;
+    if (note.isTrash) {
+      note.isArchive = false;
+    }
+    await note.save(); 
+    return note;
+  } catch (error) {
+    console.error('Error in toggleTrash:', error);
+    throw error;
+  }
+};
    
 }
 
