@@ -58,7 +58,7 @@ class UserService {
         });
       }
 
-      const newToken = jwt.sign({ id: decoded.id, email: decoded.email }, process.env.JWT_SECRET_ACCESS, { expiresIn: '1h' });
+      const newToken = jwt.sign({ email: decoded.email ,id: decoded.id}, process.env.JWT_SECRET_ACCESS, { expiresIn: '1h' });
       res.status(200).json({
         newToken: newToken
       });

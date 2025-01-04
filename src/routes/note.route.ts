@@ -15,6 +15,17 @@ class NoteRoutes {
    private routes = () => {
     this.router.post('/',userAuth,this.NoteController.create);
     
+    this.router.get('/',userAuth,this.NoteController.getAll);
+
+    this.router.get('/:id',userAuth,this.NoteController.getNote);
+ 
+    this.router.put('/:id',userAuth,this.NoteController.update);
+
+    this.router.delete('/:id',userAuth,this.NoteController.delete);
+
+
+    this.router.put('/archive/:id', userAuth, this.NoteController.toggleArchive);
+
     
 
   }

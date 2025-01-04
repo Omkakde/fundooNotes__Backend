@@ -1,42 +1,31 @@
 import sequelize, { DataTypes } from "../config/database";
 import note from "../models/notes";
 import dotenv from "dotenv";
+import { INotes } from "../interfaces/note.interface";
+
 dotenv.config();
+
 
 class noteServices  {
 
   private note =  note(sequelize,DataTypes);
   
-  public createNote = async(req,res) => {
-    // reduce code
-    const {title, description, userId}= req.body;
+  public createNote = async (body: INotes): Promise<INotes> => {
+    try {
+        body.isArchive=false;
+        body.isTrash=false;
+        const newNote = await this.note.create(body);
 
-    const data = await this.note.create({
-      title: title,
-      description: description,
-      createdBy: userId,
-      color:null,
-      isArchive: false,
-      isTrash: false
-
-      });
-
-      if(!data){
-        throw Error('cannot create note');
-      }
-      
-      res.status(200).json({
-        noteId: data.dataValues.id,
-        title: data.dataValues.title,
-        description: data.dataValues.description,
-        message: 'note created Sucessfully'
-    });
-  }
+        return newNote;
+    } catch (error) {
+        throw new Error('Error creating note');
+    }
+};
 
   public getUserNotes  = async (req, res) => {
-    const { userId } = req.body;
+    const { createdBy } = req.body;
     /// userId 
-    const data = await this.note.findAll({where:{ createdBy: userId}});
+    const data = await this.note.findAll({where:{ createdBy}});
     
     if(!data){
       throw Error('no note found');
@@ -47,19 +36,12 @@ class noteServices  {
     })
   }
 
-  public getNotesById = async (req, res) => {
-    
-    const id = req.params.id;
-    const {userId} = req.body;
-    const data = await this.note.findAll({where:{id: id, createdBy: userId}});
+  public getNoteById = async (noteId, userId) => {
+    const data = await this.note.findAll({where:{id: noteId, createdBy:userId}});
     if(!data){
-        res.status(200).json({
-            message: 'no note found'
-        });
+        throw Error ('no note found');
     }
-    res.status(200).json({
-        data
-    });
+    return data;
 }
 
 public updateNotesById = async (req,res) => {
@@ -91,6 +73,25 @@ public deleteNotesById = async (req, res) => {
       message: 'note deleted'
   });
 }
+ 
+public toggleArchiveById = async (noteId: string, userId: any): Promise<INotes | null> => {
+  try {
+    const note = await this.note.findOne({where:{ id: noteId , createdBy: userId, isTrash: false }}); 
+    
+    if (!note) {
+      throw new Error('Note not found or user not authorized'); 
+    }
+    
+    note.isArchive = !note.isArchive; 
+    await note.save();
+    return note;
+  } catch (error) {
+    console.error('Error in toggleArchive:', error); 
+    throw error;
+  }
+};
+
+
    
 }
 
