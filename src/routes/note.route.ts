@@ -17,11 +17,16 @@ class NoteRoutes {
     
     this.router.get('/',userAuth,this.NoteController.getAll);
 
-    this.router.get('/:id',userAuth,this.NoteController.get);
+    this.router.get('/:id',userAuth,this.NoteController.getNote);
  
     this.router.put('/:id',userAuth,this.NoteController.update);
 
     this.router.delete('/:id',userAuth,this.NoteController.delete);
+
+
+    this.router.put('/archive/:id', userAuth, this.NoteController.toggleArchive);
+
+    this.router.put('/trash/:id', userAuth, this.NoteController.toggleTrash);
 
   }
 

@@ -2,7 +2,9 @@ import sequelize, { DataTypes } from '../config/database';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import user from '../models/user';
+import { sendPasswordResetToken } from '../utils/mail.utils';
 import { IUser } from '../interfaces/user.interface';
+
 class UserService {
   private User = user(sequelize, DataTypes);
 
@@ -58,7 +60,7 @@ class UserService {
         });
       }
 
-      const newToken = jwt.sign({ id: decoded.id, email: decoded.email }, process.env.JWT_SECRET_ACCESS, { expiresIn: '1h' });
+      const newToken = jwt.sign({ email: decoded.email ,id: decoded.id}, process.env.JWT_SECRET_ACCESS, { expiresIn: '1h' });
       res.status(200).json({
         newToken: newToken
       });
@@ -113,6 +115,32 @@ class UserService {
       throw new Error(`Error during login: ${error.message}`);
     }
   };
+
+
+
+  //forgot password
+  public forgotPassword = async ({email}): Promise<void> =>{
+    const user = await this.User.findOne({where:{email}});
+    if(!user){
+      throw Error('user not found');
+    }
+    
+    const token = await jwt.sign({userId: user.dataValues.id,email: user.dataValues.email},process.env.JWT_SECRET_ACCESS,{ expiresIn: '1d' });
+    try{
+    await sendPasswordResetToken(`${user.dataValues.email}`, `${token}`);
+    } catch (error){
+      throw error;
+    }
+  }
+  
+  //reset user password
+  public resetPassword = async({newPassword, email}): Promise<void> =>{
+    const password = await bcrypt.hash(newPassword, 10);
+    const update = await this.User.update({password},{where:{email}});
+    if(!update){
+      throw Error('could not update password');
+    }
+  }
 }
 
 export default UserService;

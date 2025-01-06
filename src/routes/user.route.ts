@@ -20,7 +20,7 @@ class UserRoutes {
 
     //route to create a new user
     this.router.post(
-      '/register',
+      '/',
       this.UserValidator.newUserValidator,
       this.UserController.newUser
     );
@@ -35,6 +35,13 @@ class UserRoutes {
  this.router.post('/refreshtoken',this.UserController.refreshToken);
 
 /////////////////////////////////////////////////////////////////////////
+
+// forget password
+  this.router.post('/forgotpassword',this.UserController.forgotPass);
+  
+//route for reset password
+  this.router.post('/resetpassword',userAuth,this.UserController.resetPass);
+
 
 
 
