@@ -4,7 +4,7 @@ dotenv.config();
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-
+import swaggerDocs from './utils/swagger';
 import routes from './routes';
 import ErrorHandler from './middlewares/error.middleware';
 import Logger from './config/logger';
@@ -28,10 +28,15 @@ class App {
     this.api_version = process.env.API_VERSION;
 
     this.initializeMiddleWares();
+    this.swaggerCall();
     this.initializeRoutes();
     this.initializeErrorHandlers();
     this.startApp();
   }
+  public swaggerCall(): void{
+    swaggerDocs(this.app,this.port,this.host);
+  }
+
 
   public initializeMiddleWares(): void {
     this.app.use(cors());
