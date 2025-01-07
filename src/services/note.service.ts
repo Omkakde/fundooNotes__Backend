@@ -84,7 +84,7 @@ public toggleArchiveById = async (noteId: string, userId: any): Promise<INotes |
     
     note.isArchive = !note.isArchive; 
     await note.save();
-    return note;
+    return note; 
   } catch (error) {
     console.error('Error in toggleArchive:', error); 
     throw error;
