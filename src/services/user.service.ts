@@ -1,24 +1,28 @@
-import sequelize, { DataTypes } from '../config/database'; 
+
+
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import user from '../models/user';
+import {Users} from '../models/index';
+
+import { sendPasswordResetToken } from '../utils/mail.utils';
 import { IUser } from '../interfaces/user.interface';
+
 class UserService {
-  private User = user(sequelize, DataTypes);
+  
 
 
   // create new user
   public newUser = async (body: IUser ) => {
     try {
      
-      const exist = await this.User.findOne({ where: { email: body.email } });
+      const exist = await Users.findOne({ where: { email: body.email } });
       if (exist) {
         throw new Error('User already exists');
       }
 
       body.password = await bcrypt.hash(body.password, 10);
 
-      const data = await this.User.create(body);
+      const data = await Users.create(body);
 
       if (!data) {
         throw new Error('Registration failed');
@@ -51,14 +55,14 @@ class UserService {
         });
       }
 
-      const user = await this.User.findOne({ where: { id: decoded.id, refreshToken: refreshtoken } });
+      const user = await Users.findOne({ where: { id: decoded.id, refreshToken: refreshtoken } });
       if (!user) {
         res.status(404).json({
           message: "refreshtoken not found in database"
         });
       }
 
-      const newToken = jwt.sign({ id: decoded.id, email: decoded.email }, process.env.JWT_SECRET_ACCESS, { expiresIn: '1h' });
+      const newToken = jwt.sign({ email: decoded.email ,id: decoded.id}, process.env.JWT_SECRET_ACCESS, { expiresIn: '1h' });
       res.status(200).json({
         newToken: newToken
       });
@@ -72,7 +76,7 @@ class UserService {
     
     try {
       
-      const data = await this.User.findOne({ where: {email:body.email } });
+      const data = await Users.findOne({ where: {email:body.email } });
 
       if (!data) {
         return {
@@ -100,7 +104,7 @@ class UserService {
         process.env.JWT_SECRET_REFRESH, 
         { expiresIn: process.env.JWT_REFRESH_EXPIRATION } 
       );
-      await this.User.update({ refreshToken }, { where: { id: data.dataValues.id } });
+      await Users.update({ refreshToken }, { where: { id: data.dataValues.id } });
 
      
       return {
@@ -113,6 +117,32 @@ class UserService {
       throw new Error(`Error during login: ${error.message}`);
     }
   };
+
+
+
+  //forgot password
+  public forgotPassword = async ({email}): Promise<void> =>{
+    const user = await Users.findOne({where:{email}});
+    if(!user){
+      throw Error('user not found');
+    }
+    
+    const token = await jwt.sign({userId: user.dataValues.id,email: user.dataValues.email},process.env.JWT_SECRET_ACCESS,{ expiresIn: '1d' });
+    try{
+    await sendPasswordResetToken(`${user.dataValues.email}`, `${token}`);
+    } catch (error){
+      throw error;
+    }
+  }
+  
+  //reset user password
+  public resetPassword = async({newPassword, email}): Promise<void> =>{
+    const password = await bcrypt.hash(newPassword, 10);
+    const update = await Users.update({password},{where:{email}});
+    if(!update){
+      throw Error('could not update password');
+    }
+  }
 }
 
 export default UserService;

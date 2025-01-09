@@ -6,9 +6,11 @@ export default (sequelize, DataTypes) => {
         public title;
         public description;
         public createdBy;
-        public color;
+      
         public isArchive;
         public isTrash;
+
+        
     }
 
     Note.init(
@@ -16,7 +18,7 @@ export default (sequelize, DataTypes) => {
             title: DataTypes.STRING,
             description: DataTypes.STRING,
             createdBy: DataTypes.INTEGER, 
-            color:DataTypes.STRING,
+           
             isArchive: DataTypes.BOOLEAN,
             isTrash: DataTypes.BOOLEAN
         }, {
