@@ -2,6 +2,7 @@
 import dotenv from "dotenv";
 import { INotes } from "../interfaces/note.interface";
 import {Notes} from "../models/index";
+import redisClient from "../config/redis";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ class noteServices  {
     if(!data){
       throw Error('no note found');
     }
+    redisClient.setEx(`Notes?user=${createdBy}`,3600,JSON.stringify(data));
 
     res.status(200).json({
       data
@@ -41,6 +43,7 @@ class noteServices  {
     if(!data){
         throw Error ('no note found');
     }
+    await redisClient.setEx(`Note?id=${data[0].dataValues.id}&user=${data[0].dataValues.createdBy}`,3600,JSON.stringify(data[0]));
     return data;
 }
 

@@ -1,13 +1,14 @@
 import express, { IRouter } from 'express';
 import { userAuth } from '../middlewares/auth.middleware';
 import noteControllers from '../controllers/note.controller';
-import routes from './index';
+import redisCache from '../middlewares/redis.middleware';
 
 
 class NoteRoutes {
   private NoteController = new noteControllers();
   private router = express.Router();
-
+  private cache = new redisCache();
+  
   constructor() {
     this.routes();
   }
@@ -56,7 +57,7 @@ class NoteRoutes {
      *       400:
      *         description: No notes found for this user or Error retrieving notes.
      */
-    this.router.get('/',userAuth,this.NoteController.getAll);
+    this.router.get('/',userAuth,this.cache.getNotes, this.NoteController.getAll);
 
 
       /**
@@ -79,7 +80,7 @@ class NoteRoutes {
      *       400:
      *         description: Error retrieving note or Note not found.
      */
-    this.router.get('/:id',userAuth,this.NoteController.getNote);
+    this.router.get('/:id',userAuth,this.cache.getNotes, this.NoteController.getNote);
  
       /**
      * @openapi
