@@ -32,7 +32,7 @@ describe('Routes', () => {
       .post('/api/v1/users/login')
       .send({
         email: 'user1@example.com',
-        password: 'user123',
+        password: 'password123',
       });
     accessToken = response.body.data.accessToken;
     refreshToken = response.body.data.refreshToken;

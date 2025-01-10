@@ -73,7 +73,7 @@ class UserRoutes {
      *             properties:
      *               email:
      *                 type: string
-     *                 example: "user4@example.com"
+     *                 example: "user1@example.com"
      *               password:
      *                 type: string
      *                 example: "password123"

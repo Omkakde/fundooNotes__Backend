@@ -80,7 +80,7 @@ class NoteRoutes {
      *       400:
      *         description: Error retrieving note or Note not found.
      */
-    this.router.get('/:id',userAuth,this.cache.getNotes, this.NoteController.getNote);
+    this.router.get('/:id',userAuth,this.cache.getNote, this.NoteController.getNote);
  
       /**
      * @openapi
