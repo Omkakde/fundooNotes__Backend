@@ -31,8 +31,9 @@ class noteServices  {
     if(!data){
       throw Error('no note found');
     }
-    redisClient.setEx(`Notes?user=${createdBy}`,3600,JSON.stringify(data));
-
+    redisClient.setEx(`Notes?user=${createdBy}`,3600,JSON.stringify(data));// from json to string conver
+    // json in form of string
+    // three para   key, data and time(3600s)1h
     res.status(200).json({
       data
     })

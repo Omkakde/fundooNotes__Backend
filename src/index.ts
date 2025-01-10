@@ -4,7 +4,7 @@ dotenv.config();
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import swaggerDocs from './utils/swagger';
+
 import routes from './routes';
 import ErrorHandler from './middlewares/error.middleware';
 import Logger from './config/logger';
@@ -30,7 +30,6 @@ class App {
     this.api_version = process.env.API_VERSION;
 
     this.initializeMiddleWares();
-    this.swaggerCall();
     this.initializeRoutes();
     this.swaggerCall();
     this.initializeErrorHandlers();
@@ -39,14 +38,10 @@ class App {
   public swaggerCall(): void {
     swaggerDocs(this.app, this.port, this.host);
   }
-  public swaggerCall(): void{
-    swaggerDocs(this.app,this.port,this.host);
-  }
-
 
   public initializeMiddleWares(): void {
-    this.app.use(cors());
-    this.app.use(helmet());
+    this.app.use(cors());// to connect with other website  to commincate with other server
+    this.app.use(helmet());// for security
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
     this.app.use(morgan('combined', { stream: this.logStream }));
