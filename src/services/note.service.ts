@@ -8,8 +8,6 @@ dotenv.config();
 
 
 class noteServices  {
-
-
  
   public createNote = async (body: INotes): Promise<INotes> => {
     try {

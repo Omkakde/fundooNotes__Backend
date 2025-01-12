@@ -1,9 +1,7 @@
-
-
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {Users} from '../models/index';
-
+import { sendToQueue } from '../utils/rabbitmq';
 import { sendPasswordResetToken } from '../utils/mail.utils';
 import { IUser } from '../interfaces/user.interface';
 
@@ -27,7 +25,15 @@ class UserService {
       if (!data) {
         throw new Error('Registration failed');
       }
-
+      
+      const transformedData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email:data.email,
+        password:data.password,
+        refreshToken:data.refreshToken,
+      };
+      await sendToQueue('userQueue', transformedData);
       return {
         ...data.dataValues,
         message: 'Registration successful',

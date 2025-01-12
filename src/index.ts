@@ -4,7 +4,7 @@ dotenv.config();
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-
+import { connectToRabbitMQ} from './utils/rabbitmq';
 import routes from './routes';
 import ErrorHandler from './middlewares/error.middleware';
 import Logger from './config/logger';
@@ -28,7 +28,7 @@ class App {
     this.host = process.env.APP_HOST;
     this.port = process.env.APP_PORT;
     this.api_version = process.env.API_VERSION;
-
+    this.connectRabbitMQ(); 
     this.initializeMiddleWares();
     this.initializeRoutes();
     this.swaggerCall();
@@ -45,6 +45,15 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
     this.app.use(morgan('combined', { stream: this.logStream }));
+  }
+  private async connectRabbitMQ(): Promise<void> {
+    try {
+        await connectToRabbitMQ(); 
+        console.log('RabbitMQ connected');
+    } catch (error) {
+        console.error('Failed to connect RabbitMQ:', error);
+        process.exit(1); 
+    }
   }
 
   public initializeRoutes(): void {
